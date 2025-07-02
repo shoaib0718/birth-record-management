@@ -44,19 +44,22 @@ birth-record-management/
 ```bash
 git clone https://github.com/shoaib0718/birth-record-management.git
 
- Future Improvements
-Add frontend UI (React, Angular, etc.)
+## ✅ Future Improvements
 
-Implement user authentication
+- Add user authentication and authorization
+- Implement frontend UI (React, Angular, or simple HTML/CSS)
+- Add pagination for large datasets
+- Create API documentation using Swagger
+- Add unit and integration tests
+- Deploy the project on cloud platforms like Heroku, Render, or AWS
+- Implement role-based access control (RBAC)
+- Improve error handling and validation
+- Setup continuous integration (CI) for automated testing
 
-Deploy on server (using PM2 / Nginx / Apache)
 
-Unit testing
-
-API documentation (Swagger)
-
-CONTACT
+## 📞 Contact
 Developed by MIR SHOAIB AHMED for Advance Database Management Course
+Email:mirshoaibahmed8@gmail.com
 ID:19-41772-3
 Department of Computer Science and Engineering
 AIUB
