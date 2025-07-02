@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Birth Record Management - Registration</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins&display=swap" rel="stylesheet" />
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(to right, #fce4ec, #f3e5f5);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    .register-container {
+      background-color: white;
+      padding: 30px 40px;
+      border-radius: 12px;
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+      width: 400px;
+      text-align: center;
+    }
+
+    .register-container img {
+      width: 80px;
+      margin-bottom: 20px;
+    }
+
+    .register-container h2 {
+      margin-bottom: 20px;
+      color: #6a1b9a;
+    }
+
+    form {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    input, select {
+      padding: 12px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 16px;
+      width: 100%;
+      box-sizing: border-box;
+    }
+
+    button {
+      background-color: #ba68c8;
+      color: white;
+      padding: 14px;
+      border: none;
+      border-radius: 8px;
+      font-size: 18px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+      margin-top: 10px;
+    }
+
+    button:hover {
+      background-color: #9c27b0;
+    }
+
+    .login-link {
+      margin-top: 18px;
+      font-size: 14px;
+      color: #6a1b9a;
+    }
+
+    .login-link a {
+      color: #6a1b9a;
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    .login-link a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <div class="register-container">
+    <img src="https://cdn-icons-png.flaticon.com/512/1835/1835977.png" alt="Baby Icon" />
+    <h2>Register</h2>
+    <form id="registerForm">
+      <input type="text" name="firstName" placeholder="First Name" required />
+      <input type="text" name="lastName" placeholder="Last Name" required />
+      <input type="email" name="email" placeholder="Email Address" required />
+      <input type="password" name="password" placeholder="Password" required minlength="6" />
+      <input type="date" name="dob" placeholder="Date of Birth" required />
+      <input type="tel" name="contact" placeholder="Contact Number" pattern="[0-9]{10,15}" title="Enter valid contact number" required />
+      <input type="text" name="city" placeholder="City" required />
+      <button type="submit">Register</button>
+    </form>
+    <p class="login-link">
+      Already have an account? <a href="login.html">Login Here</a>
+    </p>
+  </div>
+
+  <script>
+    document.getElementById('registerForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+
+      const formData = new FormData(this);
+      const data = Object.fromEntries(formData.entries());
+
+      try {
+        const response = await fetch('/api/users/register', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(data)
+        });
+
+        const message = await response.text();
+
+        if (response.ok) {
+          alert('Registration successful!');
+          window.location.href = 'login.html';
+        } else {
+          alert('Registration failed: ' + message);
+        }
+      } catch (err) {
+        console.error(err);
+        alert('Error: Something went wrong!');
+      }
+    });
+  </script>
+</body>
+</html>

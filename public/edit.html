@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Edit Birth Record</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins&display=swap" rel="stylesheet" />
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg, #fce4ec 0%, #f3e5f5 100%);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      color: #4a148c;
+    }
+    .form-container {
+      background: #ffffffdd;
+      padding: 30px 40px;
+      border-radius: 16px;
+      box-shadow: 0 8px 20px rgba(106, 27, 154, 0.2);
+      max-width: 500px;
+      width: 100%;
+    }
+    h2 {
+      text-align: center;
+      color: #6a1b9a;
+      margin-bottom: 20px;
+    }
+    label {
+      display: block;
+      margin-top: 12px;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+    input, select {
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: 10px;
+      border: 2px solid #ba68c8;
+      font-size: 14px;
+      outline: none;
+      box-sizing: border-box;
+      transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    }
+    input:focus, select:focus {
+      border-color: #9c27b0;
+      box-shadow: 0 0 6px #9c27b0aa;
+    }
+    .form-buttons {
+      margin-top: 20px;
+      display: flex;
+      justify-content: space-between;
+    }
+    button {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 10px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.3s ease, box-shadow 0.2s ease;
+      color: white;
+    }
+    .save-btn {
+      background: linear-gradient(135deg, #9c27b0, #ba68c8);
+    }
+    .save-btn:hover {
+      background: linear-gradient(135deg, #7b1fa2, #9c27b0);
+      box-shadow: 0 6px 14px rgba(156, 39, 176, 0.5);
+    }
+    .cancel-btn {
+      background: linear-gradient(135deg, #e57373, #ef5350);
+    }
+    .cancel-btn:hover {
+      background: linear-gradient(135deg, #c62828, #d32f2f);
+      box-shadow: 0 6px 14px rgba(198, 40, 40, 0.5);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="form-container">
+    <h2>Edit Birth Record</h2>
+    <form id="editRecordForm">
+      <input type="hidden" id="recordId" name="recordId" value="" />
+
+      <label for="babyName">Baby Name:</label>
+      <input type="text" id="babyName" name="babyName" required />
+
+      <label for="fatherName">Father's Name:</label>
+      <input type="text" id="fatherName" name="fatherName" required />
+
+      <label for="motherName">Mother's Name:</label>
+      <input type="text" id="motherName" name="motherName" required />
+
+      <label for="gender">Gender:</label>
+      <select id="gender" name="gender" required>
+        <option value="">Select Gender</option>
+        <option value="Male">Male</option>
+        <option value="Female">Female</option>
+      </select>
+
+      <label for="dob">Date of Birth:</label>
+      <input type="date" id="dob" name="dob" required />
+
+      <label for="hospitalName">Hospital Name:</label>
+      <input type="text" id="hospitalName" name="hospitalName" required />
+
+      <label for="city">City Name:</label>
+      <input type="text" id="city" name="city" required />
+
+      <label for="contact">Contact Number:</label>
+      <input type="text" id="contact" name="contact" required />
+
+      <label for="country">Country:</label>
+      <input type="text" id="country" name="country" required />
+
+      <div class="form-buttons">
+        <button type="submit" class="save-btn">Update</button>
+        <button type="button" class="cancel-btn" onclick="window.location.href='dashboard.html'">Cancel</button>
+      </div>
+    </form>
+  </div>
+
+  <script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const recordId = urlParams.get('id');
+
+    async function loadRecord() {
+      if (!recordId) {
+        alert('No record ID specified');
+        window.location.href = 'dashboard.html';
+        return;
+      }
+      try {
+        const response = await fetch(`/api/records/${recordId}`);
+        if (!response.ok) throw new Error('Failed to fetch record data');
+        const record = await response.json();
+
+        console.log('Loaded record:', record);
+
+        document.getElementById('recordId').value = record.BIRTHID || '';
+        document.getElementById('babyName').value = record.CHILDNAME || '';
+        document.getElementById('fatherName').value = record.FATHERNAME || '';
+        document.getElementById('motherName').value = record.MOTHERNAME || '';
+        document.getElementById('gender').value = record.GENDER || '';
+        document.getElementById('dob').value = record.DOB || '';
+        document.getElementById('hospitalName').value = record.HOSPITALNAME || '';
+        document.getElementById('city').value = record.CITY || '';
+        document.getElementById('contact').value = record.CONTACT || '';
+        document.getElementById('country').value = record.COUNTRY || '';
+
+      } catch (error) {
+        alert('Error loading record: ' + error.message);
+        window.location.href = 'dashboard.html';
+      }
+    }
+
+    document.getElementById('editRecordForm').addEventListener('submit', async function (e) {
+      e.preventDefault();
+
+      const updatedRecord = {
+        childname: document.getElementById('babyName').value,
+        fathername: document.getElementById('fatherName').value,
+        mothername: document.getElementById('motherName').value,
+        gender: document.getElementById('gender').value,
+        dob: document.getElementById('dob').value,
+        hospitalname: document.getElementById('hospitalName').value,
+        city: document.getElementById('city').value,
+        country: document.getElementById('country').value,
+        contact: document.getElementById('contact').value
+      };
+
+      try {
+        const response = await fetch(`/api/records/${recordId}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(updatedRecord)
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.error || 'Failed to update record');
+        }
+
+        alert('Record updated successfully');
+        window.location.href = 'dashboard.html';
+      } catch (error) {
+        console.error('Update error:', error);
+        alert('Error updating record: ' + error.message);
+      }
+    });
+
+    window.onload = loadRecord;
+  </script>
+</body>
+</html>

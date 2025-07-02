@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Birth Record Dashboard</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins&display=swap" rel="stylesheet" />
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg, #fce4ec 0%, #f3e5f5 100%);
+      min-height: 100vh;
+      padding: 20px;
+      color: #4a148c;
+      overflow-x: hidden;
+    }
+
+    /* Smaller header / stats panel */
+    header {
+      position: relative;
+      margin-bottom: 20px;
+      max-width: 700px;
+      margin-left: auto;
+      margin-right: auto;
+      padding: 12px 18px;
+      border-radius: 12px;
+      background: #ffffffcc;
+      box-shadow: 0 8px 20px rgba(106, 27, 154, 0.1);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 18px;
+    }
+
+    header::before, header::after {
+      content: "";
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(60px);
+      opacity: 0.3;
+      z-index: -1;
+    }
+    header::before {
+      width: 140px;
+      height: 140px;
+      background: #ba68c8;
+      top: -50px;
+      left: -50px;
+    }
+    header::after {
+      width: 100px;
+      height: 100px;
+      background: #f48fb1;
+      bottom: -30px;
+      right: -40px;
+    }
+
+    .stats {
+      display: flex;
+      gap: 20px;
+      justify-content: center;
+      width: 100%;
+    }
+
+    .stat-item {
+      background: linear-gradient(135deg, #9c27b0, #ba68c8);
+      color: white;
+      flex: 1;
+      max-width: 130px;
+      border-radius: 10px;
+      padding: 10px 14px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      transition: transform 0.3s ease;
+      cursor: default;
+      user-select: none;
+    }
+
+    .stat-item:hover {
+      transform: scale(1.05);
+      box-shadow: 0 8px 20px rgba(156, 39, 176, 0.4);
+    }
+
+    .stat-icon {
+      font-size: 22px;
+      margin-bottom: 4px;
+      opacity: 0.85;
+    }
+
+    .stat-item h3 {
+      font-size: 18px;
+      margin: 0;
+      font-weight: 700;
+    }
+
+    .stat-item p {
+      margin: 2px 0 0 0;
+      font-size: 12px;
+      font-weight: 500;
+    }
+
+    .search-add-container {
+      max-width: 700px;
+      margin: 0 auto 20px auto;
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    #searchInput {
+      flex: 1 1 60%;
+      padding: 10px 16px;
+      font-size: 14px;
+      border-radius: 10px;
+      border: 2px solid #ba68c8;
+      transition: border-color 0.3s ease;
+      outline: none;
+      box-sizing: border-box;
+    }
+
+    #searchInput:focus {
+      border-color: #9c27b0;
+      box-shadow: 0 0 6px #9c27b0aa;
+    }
+
+    #addBtn {
+      background: linear-gradient(135deg, #9c27b0, #ba68c8);
+      color: white;
+      padding: 10px 20px;
+      font-size: 14px;
+      font-weight: 600;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      box-shadow: 0 4px 8px rgba(156, 39, 176, 0.4);
+      transition: background 0.3s ease, box-shadow 0.3s ease, transform 0.2s ease;
+      flex: 0 1 140px;
+    }
+
+    #addBtn:hover {
+      background: linear-gradient(135deg, #7b1fa2, #9c27b0);
+      box-shadow: 0 8px 18px rgba(156, 39, 176, 0.5);
+      transform: translateY(-2px);
+    }
+
+    table {
+      max-width: 700px;
+      margin: 0 auto;
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0 6px;
+      background: transparent;
+    }
+
+    th {
+      padding: 12px 14px;
+      text-align: left;
+      font-weight: 600;
+      font-size: 14px;
+      color: #6a1b9a;
+    }
+
+    tbody tr {
+      background: white;
+      box-shadow: 0 3px 8px rgba(0,0,0,0.06);
+      border-radius: 8px;
+      transition: box-shadow 0.3s ease;
+      cursor: pointer;
+    }
+
+    tbody tr:hover {
+      box-shadow: 0 6px 16px rgba(106, 27, 154, 0.2);
+    }
+
+    td {
+      padding: 10px 14px;
+      vertical-align: middle;
+      font-size: 13px;
+      color: #4a148c;
+    }
+
+    tbody tr td:first-child {
+      border-top-left-radius: 8px;
+      border-bottom-left-radius: 8px;
+    }
+
+    tbody tr td:last-child {
+      border-top-right-radius: 8px;
+      border-bottom-right-radius: 8px;
+    }
+
+    .action-buttons {
+      display: flex;
+      gap: 6px;
+    }
+
+    .action-buttons button {
+      border: none;
+      padding: 6px 10px;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 12px;
+      cursor: pointer;
+      color: white;
+      transition: background-color 0.3s ease, transform 0.15s ease;
+    }
+
+    .action-buttons button.edit-btn {
+      background: #7b1fa2;
+    }
+
+    .action-buttons button.edit-btn:hover {
+      background: #4a148c;
+      transform: translateY(-1px);
+    }
+
+    .action-buttons button.delete-btn {
+      background: #e57373;
+    }
+
+    .action-buttons button.delete-btn:hover {
+      background: #c62828;
+      transform: translateY(-1px);
+    }
+#cityBirthBtn {
+  background: linear-gradient(135deg, #6a1b9a, #8e24aa);
+  color: white;
+  padding: 10px 20px;
+  font-size: 14px;
+  font-weight: 600;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  box-shadow: 0 4px 8px rgba(138, 43, 226, 0.4);
+  transition: background 0.3s ease, box-shadow 0.3s ease, transform 0.2s ease;
+  flex: 0 1 160px;
+}
+
+#cityBirthBtn:hover {
+  background: linear-gradient(135deg, #4a148c, #6a1b9a);
+  box-shadow: 0 8px 18px rgba(138, 43, 226, 0.5);
+  transform: translateY(-2px);
+}
+
+    /* Modal styles */
+#summaryModal {
+  display: none; 
+  align-items: center;
+  justify-content: center;
+  position: fixed;
+  top: 0; left: 0;
+  width: 100vw; height: 100vh;
+  background: rgba(0,0,0,0.5);
+  z-index: 9999;
+}
+
+#summaryModal.show {
+  display: flex; 
+}
+
+#summaryModal > div {
+  background: #fff;
+  border-radius: 12px;
+  max-width: 400px;
+  width: 90%;
+  padding: 20px;
+  box-shadow: 0 0 15px rgba(0,0,0,0.3);
+  position: relative;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+#closeModal {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  border: none;
+  background: none;
+  font-size: 18px;
+  cursor: pointer;
+}
+
+#modalContent p {
+  margin: 6px 0;
+  font-size: 14px;
+  color: #4a148c;
+}
+
+
+    @media (max-width: 600px) {
+      header, .search-add-container, table {
+        max-width: 95%;
+      }
+      .stats {
+        flex-direction: column;
+        gap: 10px;
+      }
+    }
+  </style>
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
+</head>
+<body>
+
+ <header>
+    <div class="stats">
+      <div class="stat-item" title="Total Births">
+        <span class="material-icons stat-icon">baby_changing_station</span>
+        <h3 id="totalBirths">0</h3>
+        <p>Total Births</p>
+      </div>
+      <div class="stat-item" title="Male Babies">
+        <span class="material-icons stat-icon">boy</span>
+        <h3 id="maleBirths">0</h3>
+        <p>Male Babies</p>
+      </div>
+      <div class="stat-item" title="Female Babies">
+        <span class="material-icons stat-icon">girl</span>
+        <h3 id="femaleBirths">0</h3>
+        <p>Female Babies</p>
+      </div>
+    </div>
+  </header>
+
+  <div class="search-add-container">
+    <input type="text" id="searchInput" placeholder="Search by Name" autocomplete="off" />
+    <button id="addBtn" title="Add New Record">Add New Record</button>
+    <button id="cityBirthBtn" title="View Births by City">View Births by City</button>
+  </div>
+
+<table id="recordsTable">
+  <thead>
+    <tr>
+      <th>ID</th>
+      <th>Name</th>
+      <th>Gender</th>
+      <th>Date of Birth</th>
+      <th>Contact</th>
+      <th>City</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+  
+  </tbody>
+</table>
+
+<!-- Modal -->
+<div id="summaryModal">
+  <div>
+    <button id="closeModal" title="Close">✖</button>
+    <h3>Record Summary</h3>
+    <div id="modalContent">
+    </div>
+  </div>
+</div>
+
+<script>
+  const totalBirthsElem = document.getElementById('totalBirths');
+  const maleBirthsElem = document.getElementById('maleBirths');
+  const femaleBirthsElem = document.getElementById('femaleBirths');
+  const recordsTableBody = document.querySelector('#recordsTable tbody');
+  const searchInput = document.getElementById('searchInput');
+  const addBtn = document.getElementById('addBtn');
+
+  const summaryModal = document.getElementById('summaryModal');
+  const modalContent = document.getElementById('modalContent');
+  const closeModalBtn = document.getElementById('closeModal');
+
+  let records = [];
+
+  // Fetch records from backend API
+  async function fetchRecords() {
+    try {
+      const response = await fetch('/api/records');
+      if (!response.ok) throw new Error('Failed to fetch records');
+      records = await response.json();
+
+      // Defensive check: ensure records is an array
+      if (!Array.isArray(records)) {
+        records = [];
+        throw new Error('Invalid data format received');
+      }
+
+      updateStats(records);
+      populateTable(records);
+    } catch (error) {
+      alert('Error loading records: ' + error.message);
+    }
+  }
+
+  function updateStats(data) {
+    totalBirthsElem.textContent = data.length;
+
+    maleBirthsElem.textContent = data.filter(r => 
+      typeof r.GENDER === 'string' && r.GENDER.toLowerCase() === 'male'
+    ).length;
+
+    femaleBirthsElem.textContent = data.filter(r => 
+      typeof r.GENDER === 'string' && r.GENDER.toLowerCase() === 'female'
+    ).length;
+  }
+
+  function populateTable(data) {
+    recordsTableBody.innerHTML = '';
+    data.forEach(record => {
+      const tr = document.createElement('tr');
+      tr.setAttribute('data-id', record.BIRTHID ?? '');
+      tr.innerHTML = `
+        <td>${record.BIRTHID ?? ''}</td>
+        <td>${record.CHILDNAME ?? ''}</td>
+        <td>${record.GENDER ?? ''}</td>
+        <td>${record.DOB ?? ''}</td>
+        <td>${record.CONTACT ?? ''}</td>
+        <td>${record.CITY ?? ''}</td>
+        <td class="action-buttons">
+          <button class="edit-btn" data-id="${record.BIRTHID}">Edit</button>
+          <button class="delete-btn" data-id="${record.BIRTHID}">Delete</button>
+        </td>
+      `;
+      recordsTableBody.appendChild(tr);
+    });
+  }
+
+  function filterRecords() {
+    const query = (searchInput.value || '').toLowerCase().trim();
+
+    const filtered = records.filter(record =>
+      (typeof record.CHILDNAME === 'string' && record.CHILDNAME.toLowerCase().includes(query)) ||
+      (typeof record.CITY === 'string' && record.CITY.toLowerCase().includes(query)) ||
+      (typeof record.CONTACT === 'string' && record.CONTACT.includes(query))
+    );
+    
+    updateStats(filtered);
+    populateTable(filtered);
+  }
+
+  addBtn.addEventListener('click', () => {
+    window.location.href = 'add.html';
+  });
+
+  searchInput.addEventListener('input', filterRecords);
+
+  closeModalBtn.addEventListener('click', () => {
+    summaryModal.classList.remove('show');
+  });
+
+  // Close modal if click outside modal content
+  summaryModal.addEventListener('click', (e) => {
+    if (e.target === summaryModal) {
+      summaryModal.classList.remove('show');
+    }
+  });
+
+recordsTableBody.addEventListener('click', async (e) => {
+  const target = e.target;
+
+  if (target.classList.contains('edit-btn')) {
+    const id = target.getAttribute('data-id');
+    window.location.href = `edit.html?id=${id}`;
+    return;
+  }
+
+  if (target.classList.contains('delete-btn')) {
+    const id = target.getAttribute('data-id');
+    if (confirm('Are you sure you want to delete this record?')) {
+      try {
+        const res = await fetch(`/api/records/${id}`, { method: 'DELETE' });
+        if (!res.ok) throw new Error('Failed to delete record');
+        alert(`Record with ID ${id} deleted successfully`);
+        await fetchRecords(); // Refresh table
+      } catch (error) {
+        alert('Error deleting record: ' + error.message);
+      }
+    }
+    return;
+  }
+
+  // Show modal with summary on row click (excluding buttons)
+  const tr = target.closest('tr');
+  if (tr && tr.hasAttribute('data-id')) {
+    const id = tr.getAttribute('data-id');
+
+    try {
+      // Fetch detailed record by ID
+      const res = await fetch(`/api/records/${id}`);
+      if (!res.ok) throw new Error('Failed to fetch record details');
+      const record = await res.json();
+
+      // Prepare modal content with detailed info (including country)
+      modalContent.innerHTML = `
+        <p><strong>ID:</strong> ${record.BIRTHID}</p>
+        <p><strong>Name:</strong> ${record.CHILDNAME}</p>
+        <p><strong>Gender:</strong> ${record.GENDER}</p>
+        <p><strong>Date of Birth:</strong> ${record.DOB}</p>
+        <p><strong>Contact:</strong> ${record.CONTACT}</p>
+        <p><strong>City:</strong> ${record.CITY}</p>
+        <p><strong>Country:</strong> ${record.COUNTRY ?? 'N/A'}</p>
+        <p><strong>Hospital:</strong> ${record.HOSPITALNAME ?? 'N/A'}</p>
+        <p><strong>Father's Name:</strong> ${record.FATHERNAME ?? 'N/A'}</p>
+        <p><strong>Mother's Name:</strong> ${record.MOTHERNAME ?? 'N/A'}</p>
+      `;
+
+      // Show modal
+      summaryModal.classList.add('show');
+
+    } catch (error) {
+      alert('Error loading record details: ' + error.message);
+    }
+  }
+});
+const cityBirthBtn = document.getElementById('cityBirthBtn');
+
+cityBirthBtn.addEventListener('click', async () => {
+  const city = prompt('Enter city name to view births:');
+  if (!city) return;
+
+  try {
+    const response = await fetch(`/api/records/city/${encodeURIComponent(city)}`);
+    if (!response.ok) throw new Error('Error fetching city records');
+    const data = await response.json();
+
+    let html = `<h3>Births in ${city}</h3>`;
+
+    if (data.length === 0) {
+      html += `<p>No birth records found for city: <strong>${city}</strong></p>`;
+    } else {
+      html += `<ul>`;
+      data.forEach(record => {
+        html += `<li><strong>${record.CHILDNAME}</strong> (${record.GENDER})</li>`;
+      });
+      html += `</ul>`;
+    }
+
+    modalContent.innerHTML = html;
+    summaryModal.classList.add('show');
+
+  } catch (error) {
+    alert('Error fetching births by city: ' + error.message);
+  }
+});
+
+
+  // Initial load
+  fetchRecords();
+</script>
+
+</body>
+</html>
